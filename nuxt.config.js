@@ -97,7 +97,7 @@ export default {
   pwa: {
     meta: {
       title: process.env.APP_NAME,
-      author: ''
+      author: 'flukkyz555'
     },
     manifest: {
       name: process.env.APP_NAME,
@@ -106,7 +106,7 @@ export default {
       display: 'standalone',
       background_color: '#eb9421',
       theme_color: '#082141',
-      description: ''
+      description: 'haan is food delivery shared calculating price'
     },
     workbox: {
       enabled: false // process.env.NODE_ENV === 'production'
