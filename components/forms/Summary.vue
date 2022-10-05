@@ -4,7 +4,6 @@
       <v-navigation-drawer
         v-model="drawer"
         absolute
-        right
         temporary
       >
         <div class="px-3 pt-3">
