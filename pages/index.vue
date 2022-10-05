@@ -179,7 +179,7 @@
         </v-list-item>
       </v-list>
     </v-container>
-    <v-bottom-navigation absolute>
+    <v-bottom-navigation app>
       <v-btn @click="$bus.$emit('open-food-form')">
         <span>เพิ่มรายการ</span>
         <v-icon>mdi-plus</v-icon>

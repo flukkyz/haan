@@ -3,7 +3,8 @@
     <v-form ref="form" v-model="valid" @submit.prevent="save">
       <v-navigation-drawer
         v-model="drawer"
-        absolute
+        app
+        right
         temporary
       >
         <div class="px-3 pt-3">
