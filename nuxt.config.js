@@ -109,7 +109,7 @@ export default {
       description: 'haan is food delivery shared calculating price'
     },
     workbox: {
-      enabled: false // process.env.NODE_ENV === 'production'
+      enabled: process.env.NODE_ENV === 'production'
     }
   },
 
