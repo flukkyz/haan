@@ -5,179 +5,157 @@
         {{ appName }}
       </h2>
 
-      <v-list flat class="pa-0" dense>
-        <v-subheader>รายการอาหาร</v-subheader>
-        <v-divider />
-        <v-list-item-group v-if="hasData">
-          <template v-for="(item, index) in listDatas">
-            <v-list-item :key="`item-${item.index}`" @click="$bus.$emit('open-food-form',item)">
-              <v-list-item-content>
-                <v-list-item-title class="title" style="line-height: 40px;">
-                  {{ item.title }}
-                  <span v-if="item.meat">
-                    {{ item.meat }}
-                  </span>
-                  <span v-if="item.extra">
-                    พิเศษ
-                  </span>
-                  <span v-if="item.additionals.length > 0">
-                    {{ item.additionals.join(', ') }}
-                  </span>
-                </v-list-item-title>
-                <!-- <v-list-item-subtitle>
-                  gegr
-                </v-list-item-subtitle> -->
-                <v-list-item-subtitle class="headline mt-2 caption teal--text">
-                  ยอดเรียกเก็บ
-                </v-list-item-subtitle>
-                <v-list-item-title class="body-1">
-                  {{ $currencyText(Math.ceil(item.price+(item.price/total*summary.delivery_fee)+(item.price/total*summary.service_fee)-(item.price/total*summary.discount))) }}
-                  <span class="caption">
+      <p class="mb-1 ml-8 caption">
+        รายการอาหาร
+      </p>
+      <v-expansion-panels v-if="hasData" accordion multiple class="rounded-xl">
+        <v-expansion-panel
+          v-for="item in listDatas"
+          :key="`item-${item.index}`"
+        >
+          <v-expansion-panel-header hide-actions>
+            <div class="">
+              <p class="title mb-0" style="line-height: 28px;">
+                {{ item.title }}
+                <span v-if="item.meat">
+                  {{ item.meat }}
+                </span>
+                <span v-if="item.extra">
+                  พิเศษ
+                </span>
+                <span v-if="item.additionals.length > 0">
+                  {{ item.additionals.join(', ') }}
+                </span>
+              </p>
+              <p class="caption mb-0 teal--text">
+                <span class="small">
+                  ราคา
+                </span>
+                {{ $currencyText(item.price) }}
+                <span class="small">
+                  บาท
+                </span>
+              </p>
+            </div>
+            <v-spacer />
+            <div class="text-right">
+              <p class="caption mb-0 accent--text">
+                ยอดเรียกเก็บ
+              </p>
+              <p class="title mb-0">
+                {{ $currencyText(Math.ceil(item.price+(deliveryFeePerItem(item.price))+(serviceFeePerItem(item.price))-(discountPerItem(item.price)))) }}
+                <span class="body-1">
+                  บาท
+                </span>
+              </p>
+            </div>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <div class="d-flex">
+              <div>
+                <p v-if="summary.delivery_fee > 0" class="small mb-0">
+                  ค่าจัดส่ง
+                  {{ $currencyText(deliveryFeePerItem(item.price)) }}
+                  <span class="very-small">
                     บาท
                   </span>
-                </v-list-item-title>
-              </v-list-item-content>
-
-              <v-list-item-action class="justify-end">
-                <v-list-item-action-text class="body-1">
-                  {{ $currencyText(item.price) }}
-                  <span class="caption">
-                    บาท
-                  </span>
-                </v-list-item-action-text>
-                <v-list-item-action-text v-if="summary.delivery_fee > 0" class="caption">
-                  ค่าส่ง
-                  {{ $currencyText(item.price/total*summary.delivery_fee) }}
-                  <span class="caption">
-                    บาท
-                  </span>
-                </v-list-item-action-text>
-                <v-list-item-action-text v-if="summary.service_fee > 0" class="caption">
+                </p>
+                <p v-if="summary.service_fee > 0" class="small mb-0">
                   ค่าบริการเพิ่มเติม
-                  {{ $currencyText(item.price/total*summary.service_fee) }}
-                  <span class="caption">
+                  {{ $currencyText(serviceFeePerItem(item.price)) }}
+                  <span class="very-small">
                     บาท
                   </span>
-                </v-list-item-action-text>
-                <v-list-item-action-text v-if="summary.discount > 0" class="caption red--text">
+                </p>
+                <p v-if="summary.discount > 0" class="small red--text mb-0">
                   ส่วนลด
-                  {{ $currencyText((item.price/total*summary.discount)*(-1)) }}
-                  <span class="caption">
+                  {{ $currencyText((discountPerItem(item.price))*(-1)) }}
+                  <span class="very-small">
                     บาท
                   </span>
-                </v-list-item-action-text>
-                <v-list-item-action-text v-if="summary.delivery_fee > 0 || summary.service_fee > 0 || summary.discount > 0" class="body-2 mt-2">
+                </p>
+                <p class="mt-1 mb-0">
                   รวม
-                  {{ $currencyText(item.price+(item.price/total*summary.delivery_fee)+(item.price/total*summary.service_fee)-(item.price/total*summary.discount)) }}
+                  {{ $currencyText(item.price+(deliveryFeePerItem(item.price))+(serviceFeePerItem(item.price))-(discountPerItem(item.price))) }}
                   <span class="caption">
                     บาท
                   </span>
-                </v-list-item-action-text>
-              </v-list-item-action>
-            </v-list-item>
-            <v-divider :key="`divider-${index}`" />
-          </template>
-        </v-list-item-group>
-        <v-list-item v-else>
-          <v-list-item-content>
-            <v-list-item-title class="body-1 py-8">
-              ยังไม่มีข้อมูลรายการอาหาร
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item v-if="hasData">
-          <v-list-item-content>
-            <v-list-item-title class="body-1">
+                </p>
+              </div>
+              <v-spacer />
+              <div class="align-self-start">
+                <div class="d-flex">
+                  <v-icon
+                    class="mr-3"
+                    color="warning"
+                    @click="$bus.$emit('open-food-form',item)"
+                  >
+                    mdi-pencil
+                  </v-icon>
+                  <v-icon
+                    color="error"
+                    @click="deleteFood(item)"
+                  >
+                    mdi-trash-can
+                  </v-icon>
+                </div>
+              </div>
+            </div>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+        <v-expansion-panel v-if="hasData">
+          <v-expansion-panel-header hide-actions>
+            <div class="">
+              <p class="title mb-0" style="line-height: 28px;">
+                ยอดเรียกเก็บรวม
+              </p>
+            </div>
+            <v-spacer />
+            <div class="text-right">
+              <p class="headline mb-0">
+                {{ $currencyText(totalRequest) }}
+                <span class="body-1">
+                  บาท
+                </span>
+              </p>
+            </div>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <p class="mb-0 body-2">
               ราคารวม
-            </v-list-item-title>
-          </v-list-item-content>
-
-          <v-list-item-action class="justify-end">
-            <v-list-item-action-text class="body-1">
               {{ $currencyText(total) }}
-              <span class="caption">
-                บาท
-              </span>
-            </v-list-item-action-text>
-          </v-list-item-action>
-        </v-list-item>
-        <v-list-item v-if="hasData">
-          <v-list-item-content>
-            <v-list-item-title>
-              ค่าส่ง
-            </v-list-item-title>
-          </v-list-item-content>
-
-          <v-list-item-action class="justify-end">
-            <v-list-item-action-text class="body-1">
+              บาท
+            </p>
+            <p class="mb-0 body-2">
+              ค่าจัดส่ง
               {{ $currencyText(summary.delivery_fee) }}
-              <span class="caption">
-                บาท
-              </span>
-            </v-list-item-action-text>
-          </v-list-item-action>
-        </v-list-item>
-        <v-list-item v-if="hasData && summary.service_fee > 0">
-          <v-list-item-content>
-            <v-list-item-title>
+              บาท
+            </p>
+            <p v-if="summary.service_fee > 0" class="mb-0 body-2">
               ค่าบริการเพิ่มเติม
-            </v-list-item-title>
-          </v-list-item-content>
-
-          <v-list-item-action class="justify-end">
-            <v-list-item-action-text class="body-1">
               {{ $currencyText(summary.service_fee) }}
-              <span class="caption">
-                บาท
-              </span>
-            </v-list-item-action-text>
-          </v-list-item-action>
-        </v-list-item>
-        <v-list-item v-if="hasData && summary.discount > 0">
-          <v-list-item-content>
-            <v-list-item-title class="red--text">
+              บาท
+            </p>
+            <p v-if="summary.discount > 0" class="mb-0 body-2 red--text">
               ส่วนลด
-            </v-list-item-title>
-          </v-list-item-content>
-
-          <v-list-item-action class="justify-end">
-            <v-list-item-action-text class="body-1 red--text">
               {{ $currencyText(summary.discount*(-1)) }}
-              <span class="caption">
-                บาท
-              </span>
-            </v-list-item-action-text>
-          </v-list-item-action>
-        </v-list-item>
-        <v-list-item v-if="hasData">
-          <v-list-item-content>
-            <v-list-item-title class="title" style="line-height: 40px;">
+              บาท
+            </p>
+            <p class="mt-1 mb-0 body-1">
               ยอดรวมสุทธิ
-            </v-list-item-title>
-            <v-list-item-subtitle class="headline caption teal--text">
-              ยอดเรียกเก็บรวม
-            </v-list-item-subtitle>
-            <v-list-item-title class="body-2">
-              {{ $currencyText(totalRequest) }}
-              <span class="caption">
-                บาท
-              </span>
-            </v-list-item-title>
-          </v-list-item-content>
-
-          <v-list-item-action class="justify-center">
-            <v-list-item-action-text class="title">
               {{ $currencyText(totalNet) }}
-              <span class="caption">
-                บาท
-              </span>
-            </v-list-item-action-text>
-            <v-list-item-action-text class="caption">
-              {{ $thaiBathText(totalNet) }}
-            </v-list-item-action-text>
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
+              บาท
+            </p>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+      <v-card v-else class="rounded-xl">
+        <v-card-text class="py-16">
+          <p class="headline mb-0 text-center">
+            ยังไม่มีข้อมูลรายการอาหาร
+          </p>
+        </v-card-text>
+      </v-card>
     </v-container>
     <v-bottom-navigation app>
       <v-btn @click="$bus.$emit('open-food-form')">
@@ -189,9 +167,19 @@
         <span>แก้ไขค่าจัดส่ง</span>
         <v-icon>mdi-format-list-bulleted-type</v-icon>
       </v-btn>
+      <v-spacer />
+      <v-btn v-if="hasData || summary.delivery_fee > 0 || summary.service_fee > 0 || summary.discount > 0" @click="resetAll">
+        <span>ล้างข้อมูล</span>
+        <v-icon>mdi-autorenew</v-icon>
+      </v-btn>
+      <v-btn @click="$bus.$emit('open-setting-form',setting)">
+        <span>ตั้งค่า</span>
+        <v-icon>mdi-cog</v-icon>
+      </v-btn>
     </v-bottom-navigation>
     <forms-food @add="addFood" @edit="editFood" @delete="deleteFood" />
-    <forms-summary :active="hasData || summary.delivery_fee > 0 || summary.service_fee > 0 || summary.discount > 0" @save="saveSummary" @reset="resetAll" />
+    <forms-summary @save="saveSummary" />
+    <forms-setting @save="saveSetting" />
     <dialogs-delete @delete="submitDeleteFood" />
     <dialogs-confirm @confirm="submitResetAll" />
   </div>
@@ -207,6 +195,10 @@ export default {
         delivery_fee: 0,
         service_fee: 0,
         discount: 0
+      },
+      setting: {
+        service_cal: 'equal',
+        discount_cal: 'equal'
       }
     }
   },
@@ -226,10 +218,19 @@ export default {
       return this.listDatas.reduce((a, b) => a + b.price, 0) + this.summary.delivery_fee + this.summary.service_fee - this.summary.discount
     },
     totalRequest () {
-      return this.listDatas.reduce((a, b) => a + Math.ceil(b.price + (b.price / this.total * this.summary.delivery_fee) + (b.price / this.total * this.summary.service_fee) - (b.price / this.total * this.summary.discount)), 0)
+      return this.listDatas.reduce((a, b) => a + Math.ceil(b.price + this.deliveryFeePerItem(b.price) + this.serviceFeePerItem(b.price) - this.discountPerItem(b.price)), 0)
     }
   },
   methods: {
+    deliveryFeePerItem (price) {
+      return this.setting.service_cal === 'equal' ? (this.summary.delivery_fee / this.listDatas.length || 0) : price / this.total * this.summary.delivery_fee
+    },
+    serviceFeePerItem (price) {
+      return this.setting.service_cal === 'equal' ? (this.summary.service_fee / this.listDatas.length || 0) : price / this.total * this.summary.service_fee
+    },
+    discountPerItem (price) {
+      return this.setting.discount_cal === 'equal' ? (this.summary.discount / this.listDatas.length || 0) : price / this.total * this.summary.discount
+    },
     addFood (data) {
       this.listDatas.push({
         index: this.listDatas.length + 1,
@@ -254,6 +255,12 @@ export default {
     saveSummary (data) {
       this.summary = {
         ...this.summary,
+        ...data
+      }
+    },
+    saveSetting (data) {
+      this.setting = {
+        ...this.setting,
         ...data
       }
     },

@@ -4,54 +4,48 @@
       <v-navigation-drawer
         v-model="drawer"
         app
+        right
+        width="320"
         temporary
       >
         <div class="px-3 pt-3">
           <div class="d-flex align-center justify-center mt-3 mb-5">
             <v-icon class="mr-1">
-              mdi-edit
+              mdi-cog
             </v-icon>
             <h3>
-              แก้ไข{{ modelName }}
+              {{ modelName }}
             </h3>
           </div>
-          <v-currency-field
-            v-model.number="form.delivery_fee"
-            :decimal-length="0"
-            label="ค่าจัดส่ง"
-            outlined
-            class="mb-5"
-            autofocus
-            hide-details
-            suffix="บาท"
-            :min="0"
-            :max="999999999999"
-          />
-          <v-currency-field
-            v-model.number="form.service_fee"
-            :decimal-length="0"
-            label="ค่าบริการเพิ่มเติม(ถ้ามี)"
-            outlined
-            dense
-            class="mb-5"
-            suffix="บาท"
-            hide-details
-            :min="0"
-            :max="999999999999"
-          />
-        </div>
-        <div class="px-3">
-          <div class="px-5 pt-5 red rounded">
-            <v-currency-field
-              v-model.number="form.discount"
-              :decimal-length="0"
-              label="ส่วนลด"
-              outlined
-              suffix="บาท"
-              :min="0"
-              :max="999999999999"
-            />
-          </div>
+          <p class="mb-1">
+            การคำนวณค่าจัดส่งและค่าบริการเพิ่มเติม
+          </p>
+          <v-btn-toggle
+            v-model="form.service_cal"
+            mandatory
+          >
+            <v-btn value="equal">
+              เท่ากัน
+            </v-btn>
+            <v-btn value="price">
+              ตามราคา
+            </v-btn>
+          </v-btn-toggle>
+          <p class="mt-5 mb-1">
+            การคำนวณส่วนลด
+          </p>
+          <v-btn-toggle
+            v-model="form.discount_cal"
+            mandatory
+          >
+            <v-btn value="equal">
+              เท่ากัน
+            </v-btn>
+            <v-btn value="price">
+              ตามราคา
+            </v-btn>
+          </v-btn-toggle>
+
           <v-btn
             color="primary"
             x-large
@@ -74,7 +68,7 @@
 export default {
   data () {
     return {
-      modelName: 'สรุปรายการ',
+      modelName: 'ตั้งค่า',
       drawer: false,
       valid: true,
       saving: false,
@@ -82,7 +76,7 @@ export default {
     }
   },
   created () {
-    this.$bus.$on('open-summary-form', (data) => {
+    this.$bus.$on('open-setting-form', (data) => {
       this.saving = false
       this.clearData()
       this.form = { ...data }
@@ -95,7 +89,7 @@ export default {
     })
   },
   beforeDestroy () {
-    this.$bus.$off('open-summary-form')
+    this.$bus.$off('open-setting-form')
   },
   methods: {
     closeDrawer () {
@@ -103,9 +97,8 @@ export default {
     },
     clearData () {
       this.form = {
-        delivery_fee: 0,
-        service_fee: 0,
-        discount: 0
+        service_cal: 'equal',
+        discount_cal: 'equal'
       }
     },
     save () {
