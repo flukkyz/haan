@@ -43,7 +43,7 @@
                 ยอดเรียกเก็บ
               </p>
               <p class="title mb-0">
-                {{ $currencyText(Math.ceil(item.price+(deliveryFeePerItem(item.price))+(serviceFeePerItem(item.price))-(discountPerItem(item.price)))) }}
+                {{ $currencyText(totalRequestPerItem(item.price)) }}
                 <span class="body-1">
                   บาท
                 </span>
@@ -198,7 +198,8 @@ export default {
       },
       setting: {
         service_cal: 'equal',
-        discount_cal: 'equal'
+        discount_cal: 'equal',
+        round: 'up'
       }
     }
   },
@@ -218,7 +219,16 @@ export default {
       return this.listDatas.reduce((a, b) => a + b.price, 0) + this.summary.delivery_fee + this.summary.service_fee - this.summary.discount
     },
     totalRequest () {
-      return this.listDatas.reduce((a, b) => a + Math.ceil(b.price + this.deliveryFeePerItem(b.price) + this.serviceFeePerItem(b.price) - this.discountPerItem(b.price)), 0)
+      return this.listDatas.reduce((a, b) => {
+        if (this.setting.round) {
+          if (this.setting.round === 'up') {
+            return a + Math.ceil(b.price + this.deliveryFeePerItem(b.price) + this.serviceFeePerItem(b.price) - this.discountPerItem(b.price))
+          } else if (this.setting.round === 'down') {
+            return a + Math.floor(b.price + this.deliveryFeePerItem(b.price) + this.serviceFeePerItem(b.price) - this.discountPerItem(b.price))
+          }
+        }
+        return a + b.price + this.deliveryFeePerItem(b.price) + this.serviceFeePerItem(b.price) - this.discountPerItem(b.price)
+      }, 0)
     }
   },
   methods: {
@@ -230,6 +240,16 @@ export default {
     },
     discountPerItem (price) {
       return this.setting.discount_cal === 'equal' ? (this.summary.discount / this.listDatas.length || 0) : price / this.total * this.summary.discount
+    },
+    totalRequestPerItem (price) {
+      if (this.setting.round) {
+        if (this.setting.round === 'up') {
+          return Math.ceil(price + (this.deliveryFeePerItem(price)) + (this.serviceFeePerItem(price)) - (this.discountPerItem(price)))
+        } else if (this.setting.round === 'down') {
+          return Math.floor(price + (this.deliveryFeePerItem(price)) + (this.serviceFeePerItem(price)) - (this.discountPerItem(price)))
+        }
+      }
+      return price + (this.deliveryFeePerItem(price)) + (this.serviceFeePerItem(price)) - (this.discountPerItem(price))
     },
     addFood (data) {
       this.listDatas.push({

@@ -45,6 +45,17 @@
               ตามราคา
             </v-btn>
           </v-btn-toggle>
+          <p class="mt-5 mb-1">
+            การปัดเศษ
+          </p>
+          <v-btn-toggle v-model="form.round">
+            <v-btn value="up">
+              ปัดขึ้น
+            </v-btn>
+            <v-btn value="down">
+              ปัดลง
+            </v-btn>
+          </v-btn-toggle>
 
           <v-btn
             color="primary"
@@ -98,7 +109,8 @@ export default {
     clearData () {
       this.form = {
         service_cal: 'equal',
-        discount_cal: 'equal'
+        discount_cal: 'equal',
+        round: 'up'
       }
     },
     save () {
